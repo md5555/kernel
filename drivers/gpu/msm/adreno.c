@@ -2928,10 +2928,6 @@ bool adreno_hw_isidle(struct kgsl_device *device)
 	unsigned int reg_rbbm_status;
 	struct adreno_device *adreno_dev = ADRENO_DEVICE(device);
 
-	/* Don't consider ourselves idle if there is an IRQ pending */
-	if (adreno_dev->gpudev->irq_pending(adreno_dev))
-		return false;
-
 	adreno_readreg(adreno_dev, ADRENO_REG_RBBM_STATUS,
 		&reg_rbbm_status);
 
@@ -2943,7 +2939,11 @@ bool adreno_hw_isidle(struct kgsl_device *device)
 			return true;
 	}
 
-	return false;
+	/* Don't consider ourselves idle if there is an IRQ pending */
+	if (adreno_dev->gpudev->irq_pending(adreno_dev))
+		return false;
+
+	return true;
 }
 
 /**
