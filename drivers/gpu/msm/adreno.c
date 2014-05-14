@@ -2939,7 +2939,7 @@ bool adreno_hw_isidle(struct kgsl_device *device)
 		if (reg_rbbm_status == 0x110)
 			return true;
 	} else if (adreno_is_a3xx(adreno_dev)) {
-		if (!(reg_rbbm_status & 0x80000000))
+		if (!(reg_rbbm_status & ~0x80000001))
 			return true;
 	}
 
