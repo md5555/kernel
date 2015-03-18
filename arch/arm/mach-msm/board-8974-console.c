@@ -11,7 +11,7 @@
 #include <linux/kernel.h>
 #include <linux/console.h>
 #include <linux/string.h>
-#include <ram_console.h>
+#include "ram_console.h"
 #include <asm/setup.h>
 
 #define CONSOLE_NAME "ttyHSL"
