@@ -674,44 +674,6 @@ struct kgsl_gpumem_sync_cache {
 	unsigned int op;
 /* private: reserved for future use*/
 	unsigned int __pad[2]; /* For future binary compatibility */
-}
-
-/**
- * struct kgsl_device_platform_data - Struct holding all the device info
- * obtained from the dtsi file
- * @pwrlevel:		Array of struct holding pwrlevel information
- * @init_level:		Pwrlevel device is initialized with
- * @num_levels:		Number of pwrlevels for the specific device
- * @idle_timeout:	Timeout for GPU to turn its resources off
- * @strtstp_sleepwake:  Flag to decide b/w SLEEP and SLUMBER
- * @bus_control:	Flag if independent bus voting is supported
- * @clk_map:		Clocks map per platform
- * @bus_scale_table:	Bus table with different b/w votes
- * @iommu_data:		Struct holding iommu context data
- * @iommu_count:	Number of IOMMU units for the GPU
- * @csdev:		Pointer to the coresight device for this device
- * @coresight_pdata:	Coresight configuration for specific device
- * @chipid:		Chip ID for the device's GPU
- * @pm_qos_active_latency:	GPU PM QoS latency request for active state
- * @pm_qos_wakeup_latency:	GPU PM QoS latency request during wakeup
- */
-struct kgsl_device_platform_data {
-	struct kgsl_pwrlevel pwrlevel[KGSL_MAX_PWRLEVELS];
-	int init_level;
-	int num_levels;
-	unsigned int idle_timeout;
-	bool strtstp_sleepwake;
-	bool bus_control;
-	unsigned int clk_map;
-	unsigned int step_mul;
-	struct msm_bus_scale_pdata *bus_scale_table;
-	struct kgsl_device_iommu_data *iommu_data;
-	int iommu_count;
-	struct coresight_device *csdev;
-	struct coresight_platform_data *coresight_pdata;
-	unsigned int chipid;
-	unsigned int pm_qos_active_latency;
-	unsigned int pm_qos_wakeup_latency;
 };
 
 #define KGSL_GPUMEM_CACHE_CLEAN (1 << 0)
