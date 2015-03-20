@@ -56,16 +56,6 @@ config MSM_CSI30_HEADER
           This config macro is required for targets based on
           8064 platforms.
 
-config MSM_CSI31_HEADER
-        bool "Qualcomm MSM CSI 3.1 Header"
-        depends on MSMB_CAMERA
-        ---help---
-          Enable support for CSI drivers to include 3.0
-          header. This header has register macros and its
-          values and bit mask for register configuration bits
-          This config macro is required for targets based on
-          APQ8084 platform.
-
 config MSM_CSIPHY
         bool "Qualcomm MSM Camera Serial Interface Physical receiver support"
         depends on MSMB_CAMERA
@@ -135,16 +125,7 @@ config IMX134
 	---help---
 		Sony 8 MP Bayer Sensor with auto focus, uses
 		4 mipi lanes full resolution @30fps and
-		HFR @60fps and @120fps,
-		Video HDR support.
-
-config IMX132
-	bool "Sensor IMX132 (BAYER 2M)"
-	depends on MSMB_CAMERA
-	---help---
-		Sony 2 MP Bayer Sensor with auto focus, uses
-		2 mipi lanes, preview config = 1920 x 1080 at 30 fps,
-		snapshot config = 1920 x 1080 at 30 fps,
+		HFR @60fps and @120fps
 		Video HDR support.
 
 config OV2720
@@ -155,23 +136,6 @@ config OV2720
 		preview and snapshot config at 1932 * 1092 at 30 fps,
 		hfr video at 60, 90 and 120 fps. This sensor driver does
 		not support auto focus.
-
-config IMX135
-	bool "Sensor IMX135 (BAYER 12M)"
-	depends on MSMB_CAMERA
-	---help---
-		Sony 12 MP Bayer Sensor with auto focus, uses
-		4 mipi lanes, preview config = 2104 x 1560 at 49 fps,
-		snapshot config = 4208 x 3120 at 24 fps,
-		Video HDR support.
-
-config IMX188
-	bool "Sensor imx188 (Sony 1.07MP)"
-	depends on MSMB_CAMERA
-	---help---
-		Sony 1.07MP Bayer Sensor, supports 1 mipi lane,
-		preview and snapshot config at 1280*720 at 30 fps,
-		This sensor driver does not support auto focus.
 
 config OV9724
 	bool "Sensor OV9724 (BAYER 2M)"
@@ -254,20 +218,6 @@ config s5k4e1
 		and QSXGA snapshot at 15 fps.
 		This sensor driver does not support auto focus.
 
-config S5K5E2
-	bool "Sensor s5k5eayx (BAYER 5MP)"
-	depends on MSMB_CAMERA
-	---help---
-		Samsung 5 MP BAYER Sensor. It uses 2 mipi lanes,
-		supports 960P preview at 30 fps
-		and 2560x1920 snapshot at 15 fps.
-
-config OV7695
-	bool "Sensor OV7695 (YUV VGA)"
-	depends on MSMB_CAMERA
-	---help---
-		OmniVision VGA Bayer Sensor
-
 config OV12830
 	bool "OmniVision OV12830 (BAYER 12MP)"
 	depends on MSMB_CAMERA
@@ -277,12 +227,13 @@ config OV12830
 		snapshot config = 4224 * 3000 at 15 fps.
 		2 lanes max fps is 18, 4 lanes max fps is 24.
 
-config SONY_CAMERA
-	bool "Camera for Sony devices"
+config SONY_CAM_V4L2
+	bool "SONY specific camera"
 	depends on MSMB_CAMERA
+	select VIDEOBUF2_VMALLOC
+	default n
 	---help---
-	  Enables support for the cameras found in
-	  certain Sony Mobile devices.
+	  SONY specific camera module
 
 config MSM_V4L2_VIDEO_OVERLAY_DEVICE
 	tristate "Qualcomm MSM V4l2 video overlay device"
@@ -294,7 +245,7 @@ config MSM_V4L2_VIDEO_OVERLAY_DEVICE
 
 config MSMB_JPEG
 	tristate "Qualcomm MSM Jpeg Encoder Engine support"
-        depends on MSMB_CAMERA && (ARCH_MSM8974 || ARCH_MSM8226 || ARCH_APQ8084 || ARCH_MSM8916 || ARCH_MSM)
+	depends on MSMB_CAMERA && (ARCH_MSM8974 || ARCH_MSM8226)
 	---help---
 	  Enable support for Jpeg Encoder/Decoder
 	  Engine for 8974.
