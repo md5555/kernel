@@ -11,8 +11,6 @@
  * GNU General Public License for more details.
  *
  */
-#include <linux/of.h>
-
 #include "msm_sensor.h"
 #include "sony_imx188_power_settings.h"
 

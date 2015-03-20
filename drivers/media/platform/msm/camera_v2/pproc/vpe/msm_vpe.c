@@ -17,7 +17,7 @@
 #include <linux/videodev2.h>
 #include <linux/msm_ion.h>
 #include <linux/iommu.h>
-#include <linux/msm_iommu_domains.h>
+#include <mach/iommu_domains.h>
 #include <mach/iommu.h>
 #include <media/v4l2-dev.h>
 #include <media/v4l2-event.h>
@@ -210,7 +210,7 @@ static unsigned long msm_vpe_queue_buffer_info(struct vpe_device *vpe_dev,
 
 	rc = ion_map_iommu(vpe_dev->client, buff->map_info.ion_handle,
 		vpe_dev->domain_num, 0, SZ_4K, 0,
-		&buff->map_info.phy_addr,
+		(unsigned long *)&buff->map_info.phy_addr,
 		&buff->map_info.len, 0, 0);
 	if (rc < 0) {
 		pr_err("ION mmap failed\n");
@@ -512,6 +512,7 @@ static int vpe_init_hardware(struct vpe_device *vpe_dev)
 	rc = msm_cam_clk_enable(&vpe_dev->pdev->dev, vpe_clk_info,
 				vpe_dev->vpe_clk, ARRAY_SIZE(vpe_clk_info), 1);
 	if (rc < 0) {
+		rc = -ENODEV;
 		pr_err("clk enable failed\n");
 		goto disable_and_put_regulator;
 	}
@@ -530,11 +531,11 @@ static int vpe_init_hardware(struct vpe_device *vpe_dev)
 				"vpe", vpe_dev);
 		if (rc < 0) {
 			pr_err("irq request fail! start=%u\n",
-				(uint32_t) vpe_dev->irq->start);
+				vpe_dev->irq->start);
 			rc = -EBUSY;
 			goto unmap_base;
 		} else {
-			VPE_DBG("Got irq! %d\n", (int)vpe_dev->irq->start);
+			VPE_DBG("Got irq! %d\n", vpe_dev->irq->start);
 		}
 	} else {
 		VPE_DBG("Skip requesting the irq since device is booting\n");
@@ -601,6 +602,7 @@ static int vpe_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 		if (rc < 0) {
 			pr_err("%s: Couldn't init vpe hardware\n", __func__);
 			vpe_dev->vpe_open_cnt--;
+			rc = -ENODEV;
 			goto err_fixup_sub_list;
 		}
 		rc = vpe_init_mem(vpe_dev);
@@ -689,11 +691,6 @@ static int msm_vpe_notify_frame_done(struct vpe_device *vpe_dev)
 
 	if (queue->len > 0) {
 		frame_qcmd = msm_dequeue(queue, list_frame);
-		if (!frame_qcmd) {
-			pr_err("%s: %d frame_qcmd is NULL\n",
-				 __func__ , __LINE__);
-			return -EINVAL;
-		}
 		processed_frame = frame_qcmd->command;
 		do_gettimeofday(&(processed_frame->out_time));
 		kfree(frame_qcmd);
@@ -1371,11 +1368,6 @@ static long msm_vpe_subdev_ioctl(struct v4l2_subdev *sd,
 		struct msm_vpe_frame_info_t *process_frame;
 		VPE_DBG("VIDIOC_MSM_VPE_GET_EVENTPAYLOAD\n");
 		event_qcmd = msm_dequeue(queue, list_eventdata);
-		if (!event_qcmd) {
-			pr_err("%s: %d event_qcmd is NULL\n",
-				__func__ , __LINE__);
-			return -EINVAL;
-		}
 		process_frame = event_qcmd->command;
 		VPE_DBG("fid %d\n", process_frame->frame_id);
 		if (copy_to_user((void __user *)ioctl_ptr->ioctl_ptr,
@@ -1573,6 +1565,7 @@ static int vpe_probe(struct platform_device *pdev)
 	rc = vpe_init_hardware(vpe_dev);
 	if (rc < 0) {
 		pr_err("%s: Couldn't init vpe hardware\n", __func__);
+		rc = -ENODEV;
 		goto err_unregister_sd;
 	}
 	vpe_reset(vpe_dev);
